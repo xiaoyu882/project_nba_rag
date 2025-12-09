@@ -116,10 +116,10 @@ python analyst_cli.py
 
 ## Example Queries
 
-who scored the last points?
-who made the last 3-point shot?
-what happened during the last possession?
-which team committed the most recent foul?
+- Who scored the last points?
+- Who made the last 3-point shot?
+- What happened during the last possession?
+- Which team committed the most recent foul?
 
 ---
 
