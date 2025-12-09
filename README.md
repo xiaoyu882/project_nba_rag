@@ -29,10 +29,10 @@ replay_game.py # Sequential offline replay of events
 replay_game_kafka.py # Kafka producer streaming events to topic 'nba_pbp_raw'
 
 ingest_to_chroma.py # Kafka consumer:
-# - receives events
-# - converts them to text
-# - builds hashing embeddings
-# - stores in ChromaDB
+- receives events
+- converts them to text
+- builds hashing embeddings
+- stores in ChromaDB
 
 query_chroma.py # Natural-language vector search interface
 
