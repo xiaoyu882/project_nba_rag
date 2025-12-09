@@ -19,27 +19,53 @@ All components run locally. An optional LLM-based analyst is included but requir
 
 ## File Overview
 
-data/ # Downloaded NBA play-by-play CSV files
-chroma_db/ # Persistent ChromaDB vector storage
+### Data and Storage
+- `data/`  
+  Contains downloaded NBA play-by-play CSV files.
 
-download_data.py # Downloads NBA PBP data
-nba_data_loader.py # Loads and parses CSV files
+- `chroma_db/`  
+  Local persistent storage for ChromaDB vectors and metadata.
 
-replay_game.py # Sequential offline replay of events
-replay_game_kafka.py # Kafka producer streaming events to topic 'nba_pbp_raw'
+- `nba_data/`  
+  Additional data helpers or raw data (if required).
 
-ingest_to_chroma.py # Kafka consumer:
-- receives events
-- converts them to text
-- builds hashing embeddings
-- stores in ChromaDB
 
-query_chroma.py # Natural-language vector search interface
+### Data Acquisition
+- `download_data.py`  
+  Downloads NBA play-by-play data from the provided source.
 
-analyst_cli.py # Local analyst with simple rule-based explanations
-analyst_gpt.py # LLM-based analyst (optional; requires API key, may incur costs)
+- `nba_data_loader.py`  
+  Loads, parses, and formats downloaded NBA CSV files.
 
-README.md # Project documentation
+
+### Event Replay and Streaming
+- `replay_game.py`  
+  Offline replay: prints game events sequentially for inspection.
+
+- `replay_game_kafka.py`  
+  Kafka producer: streams play-by-play events into the topic `nba_pbp_raw`.
+
+
+### Data Ingestion and Vector Storage
+- `ingest_to_chroma.py`  
+  Kafka consumer that:
+  - receives streaming events  
+  - converts events to text  
+  - generates hashing-based embeddings  
+  - stores vectors and metadata in ChromaDB  
+
+
+### Querying and Analysis
+- `query_chroma.py`  
+  Command-line tool for natural-language querying of the vector database.
+
+- `analyst_cli.py`  
+  Local rule-based analyst providing simple English explanations based on retrieved events  
+  (offline; no API required).
+
+- `analyst_gpt.py`  
+  LLM-based analyst using GPT or compatible APIs.  
+  Requires an API key and may incur usage fees.
 
 ---
 
