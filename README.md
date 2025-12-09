@@ -1,73 +1,105 @@
 # NBA Play-by-Play Streaming Pipeline  
-### Kafka + ChromaDB + Real-Time Retrieval + Analyst CLI
+Data Stream Processing – Final Project
 
-This project implements a real-time streaming and retrieval pipeline for NBA play-by-play data using Apache Kafka, Python producers/consumers, ChromaDB vector search, lightweight hashing embeddings, and a rule-based analyst interface.
+This project implements a real-time data streaming pipeline for NBA play-by-play (PBP) events using Apache Kafka, Python producers/consumers, ChromaDB vector storage, and a lightweight analyst interface. The system supports natural-language queries over the game and retrieves semantically relevant events from a vector database.
 
-It corresponds to Project 2 — Theme 5.
-
----
-
-## Project Overview
-
-The system streams NBA play-by-play data through Kafka, ingests it into a local vector database, and supports natural-language queries using semantic retrieval.
-
-Users can ask questions such as:
-
-- Who scored the last points?  
-- Why was there a foul?  
-- What happened during the last possession?
+All components run locally. An optional LLM-based analyst is included but requires an external API key and may incur usage fees.
 
 ---
 
-## Supplement: Optional GPT-Based Version (Limited by API Quotas)
+## Features
 
-The project also includes an optional version of the analyst module that uses commercial large language models (e.g., OpenAI GPT-4/4o).  
-These models can generate more fluent explanations but require paid API credits.
-
-Due to quota limits, the default configuration uses a fully local, rule-based analyst that does not depend on any external API and can run on any machine without cost.
-
----
-
-## System Architecture
-
-┌──────────────────┐ ┌─────────────────────────┐
-│ NBA CSV Data │ │ replay_game_kafka.py │
-│ (downloaded once)│ ---> │ sends events to Kafka │
-└──────────────────┘ └─────────────┬────────────┘
-│
-Kafka topic: nba_pbp_raw
-│
-┌─────────────────────────┴──────────────────────────┐
-│ ingest_to_chroma.py │
-│ - consumes Kafka stream │
-│ - builds text + hashing embeddings │
-│ - inserts documents into ChromaDB │
-└───────────────┬────────────────────────────────────┘
-│
-ChromaDB vector storage
-│
-┌─────────────────┴─────────────────────┐
-│ query_chroma.py analyst_cli.py │
-│ - semantic search - rule-based Q&A │
-└────────────────────────────────────────┘
-
+- Real-time event streaming through Kafka  
+- Play-by-play ingestion, embedding, and storage in ChromaDB  
+- Natural-language retrieval over historical or live-streamed events  
+- Rule-based analyst for English explanations (local, no API required)  
+- Optional GPT-based analyst for enhanced explanations (requires API)  
 
 ---
 
-## Folder Structure
+## File Overview
+
+data/ # Downloaded NBA play-by-play CSV files
+chroma_db/ # Persistent ChromaDB vector storage
+
+download_data.py # Downloads NBA PBP data
+nba_data_loader.py # Loads and parses CSV files
+
+replay_game.py # Sequential offline replay of events
+replay_game_kafka.py # Kafka producer streaming events to topic 'nba_pbp_raw'
+
+ingest_to_chroma.py # Kafka consumer:
+# - receives events
+# - converts them to text
+# - builds hashing embeddings
+# - stores in ChromaDB
+
+query_chroma.py # Natural-language vector search interface
+
+analyst_cli.py # Local analyst with simple rule-based explanations
+analyst_gpt.py # LLM-based analyst (optional; requires API key, may incur costs)
+
+README.md # Project documentation
+
+---
+
+## System Workflow
+
+1. download_data.py
+
+2. replay_game_kafka.py → streams play-by-play events to Kafka
+
+3. ingest_to_chroma.py → consumes events, embeds them, stores in ChromaDB
+
+4. query_chroma.py → retrieves relevant events based on a question
+
+5. analyst_cli.py → produces explanations (local)
+   or
+   analyst_gpt.py → produces LLM explanations (API required)
 
 
+---
 
-project/
-│
-├── download_data.py
-├── replay_game_kafka.py
-├── ingest_to_chroma.py
-├── query_chroma.py
-├── analyst_cli.py # default local analyst (no LLM)
-├── analyst_gpt.py # optional GPT-based analyst (requires API credits)
-│
-├── data/ # downloaded CSV files
-├── chroma_db/ # persistent vector storage
-└── README.md
+## Running Instructions
+
+Open multiple terminals and execute:
+
+### 1. Start Zookeeper
+cd C:\kafka_2.13-3.6.0
+bin\windows\zookeeper-server-start.bat config\zookeeper.properties
+
+### 2. Start Kafka Broker
+cd C:\kafka_2.13-3.6.0
+bin\windows\kafka-server-start.bat config\server.properties
+
+### 3. Start Chroma ingestion
+python ingest_to_chroma.py
+
+### 4. Stream game events into Kafka
+python replay_game_kafka.py
+
+### 5. Query the vector store
+python query_chroma.py
+
+
+### 6. Run the analyst (local, recommended)
+python analyst_cli.py
+
+
+---
+
+## Example Queries
+
+who scored the last points?
+who made the last 3-point shot?
+what happened during the last possession?
+which team committed the most recent foul?
+
+---
+
+## Notes
+
+- The project is fully reproducible on Windows and requires no external paid services.  
+- The GPT-based analyst (`analyst_gpt.py`) provides enhanced explanations but relies on external API usage and may incur charges.  
+- The default pipeline (`analyst_cli.py`) operates entirely offline and is used for grading unless otherwise specified.
 
